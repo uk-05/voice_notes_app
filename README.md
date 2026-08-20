@@ -1,297 +1,173 @@
-# Voice Notes App
+<div align="center">
 
-A beginner-friendly Flutter app that lets users speak instead of type. Speech
-is transcribed live using the device's built-in speech engine (no API key, fully free) and saved locally with sqflite — **scoped to a logged-in
-account**, so notes/history only persist if the user has signed up or logged in.
+# 🎙️ Voice Notes App
 
-## Features
+**Speak it. Save it. Never lose it.**
 
-- *Landing page* shown first on every app launch (Create Account / Log In)
-- *Login & Sign Up* (local, on-device — email + password, hashed with SHA-256 before storage)
-- *Email OTP verification* — signup sends a 6-digit code to the user's email; the account only becomes usable after the correct code is entered (confirms the email address is real and belongs to them)
-- **Email notifications** — a "new login" email is sent every time someone
-  logs into a verified account, and a "history downloaded" email is sent
-  whenever notes are exported
-- **Download history** — the download icon in the home screen header
-  exports all your notes as a text file and opens the share sheet to
-  save/send it
-- Notes are private per account — without logging in, nothing is saved and
-  no history is shown
-- Session persistence — once logged in, the app skips the landing page on
-  future launches until the user logs out
-- Mic button to start/stop recording
-- Live transcription appears in the text field as you speak
-- Save notes to a persistent local list (newest first)
-- Swipe-to-delete or tap the delete icon on any note
-- Tap a note to open a full edit screen and update its text
-- Polished UI: gradient header/landing page, rounded cards, soft shadows,
-  consistent theme (see `lib/theme/app_theme.dart`)
+A cross-platform Flutter app that turns speech into text in real time and saves it as private, per-account notes — no API keys, no cloud AI, no cost.
 
-## ✉️ Required: set up email sending before signup/login will work
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Windows%20%7C%20Web-4CAF50)](#-platform-support)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](#-license)
 
-OTP codes and notification emails are sent for real via Gmail SMTP using
-the `mailer` package. **You must fill in your own Gmail credentials**
-before this works:
+</div>
+
+---
+
+## 📖 Overview
+
+Voice Notes App lets a user speak naturally and see their words transcribed live on screen, then save that text as a note tied to their own account. Every account is protected with hashed passwords and email OTP verification, and every note is scoped strictly to the account that created it — nothing is visible without logging in.
+
+Built as a Flutter learning/portfolio project, it runs on **Android, iOS, Windows, and Web** from a single codebase, using the device's own built-in speech engine instead of any paid transcription API.
+
+## ✨ Features
+
+- 🎤 **Live voice-to-text** — tap the mic and watch your words appear as you speak
+- 🔐 **Account system** — sign up / log in with email + password (SHA-256 hashed, stored locally)
+- ✅ **Email OTP verification** — a 6-digit code confirms every new account before it can be used
+- 📬 **Email notifications** — alerts on new logins and on history downloads
+- 🔒 **Private, per-account notes** — nothing is saved or shown without being logged in
+- 💾 **Session persistence** — stay logged in across app restarts, until you log out
+- 📝 **Full note management** — save, edit, and delete notes; swipe-to-delete supported
+- 📤 **Export history** — download all your notes as a text file and share it
+- 🎨 **Polished UI** — gradient headers, rounded cards, and a consistent custom theme
+
+## 📱 Platform Support
+
+| Platform | Status | Storage Engine |
+|---|---|---|
+| Android | ✅ | `sqflite` (native) |
+| iOS | ✅ | `sqflite` (native) |
+| Windows | ✅ | `sqflite_common_ffi` |
+| Web (Chrome/Edge) | ✅ | `sqflite_common_ffi_web` (IndexedDB) |
+
+> 🎧 Voice recognition is most reliable on a physical Android device. Desktop/web accuracy depends on the OS or browser's built-in speech engine.
+
+## 🛠️ Tech Stack
+
+| Purpose | Package |
+|---|---|
+| Speech-to-text | `speech_to_text` |
+| Runtime permissions | `permission_handler` |
+| Local database | `sqflite`, `path` |
+| Password hashing | `crypto` |
+| Session persistence | `shared_preferences` |
+| Email (OTP + notifications) | `mailer` |
+| File export / sharing | `path_provider`, `share_plus` |
+| State management | `provider` |
+| Date formatting | `intl` |
+
+## 📂 Project Structure
+
+```
+voice_notes_app/
+├── lib/
+│   ├── main.dart                # App entry point + auth routing
+│   ├── config/
+│   │   └── email_config.dart    # Gmail SMTP credentials (see Configuration)
+│   ├── theme/
+│   │   └── app_theme.dart       # Colors, gradients, ThemeData
+│   ├── models/
+│   │   ├── note.dart            # Note data model
+│   │   └── user.dart            # User data model
+│   ├── services/
+│   │   ├── speech_service.dart      # Wraps speech_to_text
+│   │   ├── database_service.dart    # sqflite: users, notes, OTPs
+│   │   ├── auth_service.dart        # Signup / OTP / login / logout
+│   │   ├── email_service.dart       # Sends OTP + notification emails
+│   │   └── notes_provider.dart      # App state, scoped per user
+│   └── screens/
+│       ├── landing_screen.dart
+│       ├── login_screen.dart
+│       ├── signup_screen.dart
+│       ├── otp_verification_screen.dart
+│       ├── home_screen.dart
+│       └── edit_note_screen.dart
+├── setup_and_run.ps1            # One-shot Windows setup + run script
+└── pubspec.yaml
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) installed (`flutter --version` to confirm)
+- A physical device is strongly recommended for the voice demo — most emulators/simulators don't expose a working microphone
+
+### Installation
+
+**Windows (PowerShell) — one command:**
+
+```powershell
+git clone https://github.com/<your-username>/voice_notes_app.git
+cd voice_notes_app
+powershell -ExecutionPolicy Bypass -File setup_and_run.ps1
+```
+
+This script generates the native `android/`, `ios/`, `windows/`, and `web/` project folders for your installed Flutter SDK, adds the required mic/speech permissions, fetches dependencies, and launches the app.
+
+**macOS / Linux (manual):**
+
+```bash
+git clone https://github.com/<your-username>/voice_notes_app.git
+cd voice_notes_app
+flutter config --enable-web
+flutter create --platforms=android,ios,web .
+flutter pub get
+flutter run
+```
+
+Then add the microphone/speech permissions to `AndroidManifest.xml` and `Info.plist` as described in the in-repo setup notes before your first run.
+
+### Configuration — Email Setup (required for signup/login)
+
+OTP codes and notification emails are sent via Gmail SMTP. Before signup/login will fully work:
 
 1. Open `lib/config/email_config.dart`
-2. Turn on 2-Step Verification on your Google account (if not already):
-   https://myaccount.google.com/security
-3. Create an App Password: https://myaccount.google.com/apppasswords
-4. Copy the 16-character code Google gives you (no spaces)
-5. Fill in:
+2. Enable 2-Step Verification on your Google account
+3. Generate an [App Password](https://myaccount.google.com/apppasswords)
+4. Fill in your credentials:
    ```dart
    static const String senderEmail = 'youraddress@gmail.com';
    static const String senderPassword = 'your16charapppassword';
    ```
 
-If you skip this step, the app still works for typed notes — signup/login/
-download just log a message to the console instead of sending an email
-(so you're never blocked during development), but OTP codes won't arrive
-anywhere, which means **no signup will be able to complete** until either
-you fill in real credentials or you read the OTP straight from the debug
-console (it's not printed by default — check `email_service.dart` if you
-want to add that for local testing only).
+Without this, typed notes still work locally, but OTP emails won't be delivered, so account signup can't complete.
 
-## Tech stack
+## 🔄 How It Works
 
-| Piece                | Package             |
-|-----------------------|---------------------|
-| Speech-to-text         | `speech_to_text`     |
-| Runtime permissions    | `permission_handler` |
-| Local database         | `sqflite` + `path`   |
-| Password hashing       | `crypto`              |
-| Session persistence    | `shared_preferences`  |
-| Email (OTP + notifications) | `mailer`          |
-| File export / sharing  | `path_provider`, `share_plus` |
-| State management       | `provider`            |
-| Date formatting        | `intl`                |
+1. App launches → `AuthGate` checks for a saved session
+2. No session → `LandingScreen` (Create Account / Log In)
+3. Sign up → password is hashed, a 6-digit OTP is emailed, account starts unverified
+4. Correct OTP → account is verified, session is saved, user lands on `HomeScreen`
+5. Tap the mic → live transcription streams into the text field as you speak
+6. Save → the note is written to `sqflite`, tagged to the logged-in user
+7. Notes list is scoped per account — edit, delete, or export at any time
+8. Log out → session and in-memory notes are cleared, back to `LandingScreen`
 
-## Project structure
+## 📄 Documentation
 
-```
-voice_notes_app/
-├── setup_and_run.ps1                          # one-shot Windows setup + run script
-├── (android/, ios/ — generated by the script or `flutter create .`, not checked in)
-├── lib/
-│   ├── main.dart                              # app entry + AuthGate routing
-│   ├── config/
-│   │   └── email_config.dart                  # ⚠️ fill in your Gmail + App Password
-│   ├── theme/
-│   │   └── app_theme.dart                     # colors, gradients, ThemeData
-│   ├── models/
-│   │   ├── note.dart                          # Note data model (per-user)
-│   │   └── user.dart                          # AppUser data model (+isVerified)
-│   ├── services/
-│   │   ├── speech_service.dart                # wraps speech_to_text
-│   │   ├── database_service.dart              # wraps sqflite (users + notes + otps)
-│   │   ├── auth_service.dart                  # signup/OTP/login/logout/session
-│   │   ├── email_service.dart                 # sends OTP + notification emails
-│   │   └── notes_provider.dart                # app state, scoped to user
-│   └── screens/
-│       ├── landing_screen.dart                # first screen on launch
-│       ├── login_screen.dart
-│       ├── signup_screen.dart
-│       ├── otp_verification_screen.dart       # 6-digit email code entry
-│       ├── home_screen.dart                   # mic + live text + list + download
-│       └── edit_note_screen.dart               # edit/delete a saved note
-└── pubspec.yaml
-```
+- [`WORKFLOW.md`](./WORKFLOW.md) — full walkthrough of every user flow with diagrams
+- [`PRIVACY_POLICY.md`](./PRIVACY_POLICY.md) — what data is collected and how it's used
+- [`TERMS_AND_CONDITIONS.md`](./TERMS_AND_CONDITIONS.md) — usage terms and disclaimers
 
-## How login gates notes/history
+## 🗺️ Roadmap
 
-- `NotesProvider` only loads or saves notes when it has a `userId` set via
-  `setUser()`. On logout, `setUser(null)` clears the in-memory list.
-- The `notes` table has a `userId` foreign key, so `DatabaseService.
-  getNotesForUser()` always returns only that account's notes.
-- `AuthGate` (in `main.dart`) checks `shared_preferences` on every launch:
-  logged-in → straight to `HomeScreen`; not logged in → `LandingScreen`.
-- This is **local, on-device auth** — good for gating history behind an
-  account with zero backend cost, but not intended as production-grade
-  security for a networked multi-device app.
+- [ ] Search and filter over saved notes
+- [ ] Note categories / tags
+- [ ] Auto-punctuation and cleanup of transcribed text
 
-> **If you're upgrading from a previous version of this project:** the
-> database schema changed (added a `users` table, a `userId` column on
-> `notes`, an `isVerified` column, and an `otps` table), and the DB version
-> is now 3. Uninstall/reinstall the app during development so a fresh
-> database is created — otherwise `onUpgrade` isn't handled and old
-> installs will error.
+## 📝 License
 
-## ⚡ For your presentation: Android, Windows, and Web all work
+This project is available under the [MIT License](LICENSE).
 
-This app now runs on **Android, iOS, Windows desktop, and web
-(Chrome/Edge)**. The database layer (`sqflite`) automatically switches to
-the right storage engine per platform:
+## 👤 Author
 
-| Platform         | Database engine                          |
-|-------------------|------------------------------------------|
-| Android / iOS      | `sqflite` (default, native)               |
-| Windows            | `sqflite_common_ffi` (local SQLite file)  |
-| Web (Chrome/Edge)  | `sqflite_common_ffi_web` (IndexedDB)      |
+**Usman**
+BSCS Student, Barani Institute of Information Technology (BIIT), Rawalpindi
 
-**One thing to know:** voice recognition quality/reliability is best on a
-real Android device. On Windows/Web it depends on OS/browser mic support
-and can be less consistent — worth doing a quick test run on each target
-before presenting, so you know what to expect live.
+---
 
-**Don't have a phone handy? Use an Android emulator too:**
-1. Open Android Studio → **More Actions → Virtual Device Manager**
-2. Click **Create Device**, pick any phone, Next, pick a system image,
-   Finish
-3. Click ▶ to boot it — takes ~1 minute — Flutter detects it automatically
-
-## 🚀 Quick start (one command)
-
-The `android/`, `ios/`, `windows/`, and `web/` native project folders
-aren't checked in — every Flutter SDK version generates slightly different
-native scaffolding, so they're generated fresh from **your** installed
-Flutter SDK. This avoids stale/incomplete native folders causing build
-errors (e.g. "deleted Android v1 embedding").
-
-**Windows (PowerShell):**
-
-```powershell
-cd voice_notes_app
-powershell -ExecutionPolicy Bypass -File setup_and_run.ps1
-```
-
-That one script will: clear any corrupted pub-cache files for the
-desktop/web database packages (a common cause of "system cannot find the
-file specified" errors), enable Windows/Web support, generate
-`android/`+`ios/`+`windows/`+`web/`, add the Android mic/speech
-permissions, set `minSdkVersion` to 21, fetch dependencies, list your
-available devices, and launch the app — **pick whichever target you want
-to demo on (Android emulator/phone, Windows, or Chrome/Edge) when
-prompted.**
-
-**Mac/Linux (or if you prefer doing it manually):**
-
-```bash
-cd voice_notes_app
-flutter config --enable-web
-flutter create --platforms=android,ios,web .
-```
-
-Then add these permissions by hand (also documented inline in the script
-above if you want to copy them):
-
-- `android/app/src/main/AndroidManifest.xml` — inside `<manifest>`, add:
-  ```xml
-  <uses-permission android:name="android.permission.RECORD_AUDIO" />
-  <uses-permission android:name="android.permission.INTERNET" />
-  <queries>
-      <intent>
-          <action android:name="android.speech.RecognitionService" />
-      </intent>
-  </queries>
-  ```
-- `ios/Runner/Info.plist` — inside `<dict>`, add:
-  ```xml
-  <key>NSMicrophoneUsageDescription</key>
-  <string>Voice Notes needs microphone access to record your voice and turn it into text.</string>
-  <key>NSSpeechRecognitionUsageDescription</key>
-  <string>Voice Notes uses speech recognition to convert what you say into written notes.</string>
-  ```
-- `android/app/build.gradle` — set `minSdkVersion 21` (speech_to_text needs it)
-
-Then:
-
-```bash
-flutter pub get
-flutter run
-```
-
-**If you hit a "system cannot find the file specified" error mentioning
-`sqflite_common_ffi`:** your local pub cache has a corrupted copy of that
-package. Delete it and re-fetch:
-
-```powershell
-Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Pub\Cache\hosted\pub.dev\sqflite_common_ffi*"
-flutter pub get
-```
-
-(`setup_and_run.ps1` already does this automatically every time.)
-
-A physical phone is the most reliable option for the *voice* demo since most emulators/
-simulators don't have a working microphone.
-
-## Setup instructions (background — already handled by the script above)
-
-### Prerequisites
-
-- Flutter SDK installed (`flutter --version` to confirm)
-- A physical device is strongly recommended — most emulators/simulators
-  don't have a working microphone or speech engine.
-
-Everything else (generating `android/`/`ios/`, permissions, `minSdkVersion`,
-`flutter pub get`, `flutter run`) is covered by the Quick start section
-above.
-
-## How it works (quick tour)
-
-1. App launches into `AuthGate`, which checks for a saved session. No
-   session → `LandingScreen` (Create Account / Log In buttons).
-2. `SignUpScreen` calls `AuthService.signUp()`, which hashes the password,
-   creates an **unverified** user row, generates a 6-digit OTP, saves it
-   (with a 10-minute expiry) and emails it via `EmailService.sendOtp()`.
-   The app then navigates to `OtpVerificationScreen`.
-3. `LoginScreen` calls `AuthService.logIn()`. If the account isn't verified
-   yet, it sends a fresh OTP and also routes to `OtpVerificationScreen`. If
-   the password is correct and the account IS verified, it logs the user
-   in, saves the session (`shared_preferences`), and fires off a "new
-   login" notification email in the background.
-4. On `OtpVerificationScreen`, entering the correct code calls
-   `AuthService.verifyOtp()`, which checks the code + expiry, marks the
-   account verified, deletes the used code, saves the session, and logs
-   the user in — `NotesProvider.setUser(userId)` then scopes all further
-   note reads/writes to that account, and the app navigates to
-   `HomeScreen`.
-5. `SpeechService.initialize()` requests mic permission via
-   `permission_handler`, then initializes `speech_to_text`.
-6. Tapping the mic calls `startListening()`, which streams partial and final
-   results back through the `onResult` callback — the home screen updates
-   the `TextField` on every callback for a "live captioning" feel.
-7. Tapping **Save note** hands the text to `NotesProvider.addNote()`, which
-   writes it to sqflite (tagged with the current `userId`) and updates the
-   in-memory list.
-8. The notes list is a `ListView.builder` fed by `Consumer<NotesProvider>`,
-   sorted newest-first.
-9. Swiping a note (or tapping its delete icon) calls `deleteNote()`.
-   Tapping a note opens `EditNoteScreen`, which can save an edit or delete
-   the note outright.
-10. Tapping the **download icon** exports all notes to a text file, opens
-    the share sheet to save/send it, and emails a "history downloaded"
-    notification to the account's email.
-11. Tapping the logout icon on `HomeScreen` clears the session and the
-    in-memory notes, then returns to `LandingScreen`.
-
-## Notes on accuracy
-
-Recognition quality depends entirely on the device's built-in engine (Google
-on Android, Apple on iOS, SAPI on Windows), so accuracy will vary between
-devices and drops in noisy environments — Windows' built-in SAPI engine in
-particular is much less accurate than Android's without voice training
-(Control Panel → Speech Recognition → "Train your computer to better
-understand you"). Testing in both a quiet room and a noisy one is a good
-way to see this in practice.
-
-## Documentation
-
-- **`WORKFLOW.md`** — a full walkthrough of every user flow in the app
-  (signup, OTP verification, login, recording/saving notes, editing,
-  downloading history, logging out) with diagrams, plus a map of which
-  requirement lives in which file. Good source material for a project
-  report or presentation.
-- **`PRIVACY_POLICY.md`** — what data the app collects, where it's stored,
-  and how email/microphone access is used.
-- **`TERMS_AND_CONDITIONS.md`** — usage terms, account responsibilities,
-  and disclaimers.
-- Both legal documents are also viewable **inside the app** — tap "Terms"
-  or "Privacy Policy" at the bottom of the Sign Up screen.
-- Fill in the `[fill in ...]` placeholders (date, jurisdiction, contact
-  email) in both documents before treating them as final for submission.
-
-## Possible next steps
-
-- Add search/filter over saved notes
-- Add note categories or tags
-- Auto-punctuate or clean up transcribed text before saving
+<div align="center">
+Made with Flutter 💙
+</div>
