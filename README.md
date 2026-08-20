@@ -18,7 +18,7 @@ A cross-platform Flutter app that turns speech into text in real time and saves 
 
 Voice Notes App lets a user speak naturally and see their words transcribed live on screen, then save that text as a note tied to their own account. Every account is protected with hashed passwords and email OTP verification, and every note is scoped strictly to the account that created it — nothing is visible without logging in.
 
-Built as a Flutter learning/portfolio project, it runs on **Android, iOS, Windows, and Web** from a single codebase, using the device's own built-in speech engine instead of any paid transcription API.
+Built as a Flutter learning/portfolio project, it runs on **Android, Windows, and Web** from a single codebase, using the device's own built-in speech engine instead of any paid transcription API.
 
 ## ✨ Features
 
@@ -37,9 +37,7 @@ Built as a Flutter learning/portfolio project, it runs on **Android, iOS, Window
 | Platform | Status | Storage Engine |
 |---|---|---|
 | Android | ✅ | `sqflite` (native) |
-| iOS | ✅ | `sqflite` (native) |
 | Windows | ✅ | `sqflite_common_ffi` |
-| Web (Chrome/Edge) | ✅ | `sqflite_common_ffi_web` (IndexedDB) |
 
 > 🎧 Voice recognition is most reliable on a physical Android device. Desktop/web accuracy depends on the OS or browser's built-in speech engine.
 
