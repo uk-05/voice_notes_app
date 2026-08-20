@@ -1,0 +1,52 @@
+name: voice_notes_app
+description: A voice-to-text notes app built with Flutter.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+
+  # Speech to text
+  speech_to_text: ^7.0.0
+
+  # Microphone permission - mainly Android/iOS
+  permission_handler: ^11.3.1
+
+  # Database
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  sqflite_common_ffi: ^2.3.4+4
+  sqflite_common_ffi_web: ^0.4.5+3
+
+  # State management
+  provider: ^6.1.2
+
+  # Date formatting
+  intl: ^0.19.0
+
+  # Password hashing
+  crypto: ^3.0.5
+
+  # Session
+  shared_preferences: ^2.2.3
+
+  # Email
+  mailer: ^6.1.0
+
+  # File export / sharing
+  path_provider: ^2.1.4
+  share_plus: ^11.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
